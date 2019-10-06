@@ -51,7 +51,6 @@ export default {
   },
   methods: {
     show_plan(item) {
-      console.log("detaio", item)
       this.show_item = item
     },
     copy( text ) {
@@ -76,7 +75,3 @@ export default {
   }
 }
 </script>
-
-<style scoped lang="scss">
-
-</style>

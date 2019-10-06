@@ -16,6 +16,10 @@
           <span v-show="active === idx" >
             <button class="btn btn-blue" type="button" @click="editPost(store_blog.name, post.id)"> تحرير </button>
             <button class="btn btn-blue" type="button" @click="openHref(store_blog.root_settings.baseURL+'post/'+post.slug)"> عرض </button>
+            <button class="btn text-danger" type="button" @click="deletePost(post.id)"> 
+              <template v-if="! confirm_step[post.id]">حذف</template>
+              <template v-if="confirm_step[post.id]"> متأكد ؟ </template>
+            </button>
           </span>
         </div>
         
@@ -33,19 +37,22 @@
     </ul>
 
     <h2>Images Posts of {{store_blog.name}}</h2>
-    <ul class="list-group list-group-flush">
+    <ul class="row">
       <li 
       v-for="(image, idx) in images.slice().reverse()" :key='idx'
-      class="list-group-item ">
-      <img :src="image.src" alt="" width="150px">
+      @mouseover="img_active = idx" @mouseout="img_active = -1"
+      class="list-group-item col-4">
+      <img :src="image.src" alt="" width="90%">
       
-      <div >{{image.caption}}</div>
-      <div > 
-        <button class="btn btn-primary" type="button" @click="editImage(image.id)"> Edit </button>
-        <button class="btn btn-danger" type="button" @click="deleteImage(image.id)">
-          <template v-if="! confirm_step[image.id]">Delete Me</template>
-          <template v-if="confirm_step[image.id]">Sure ?</template>
-        </button>
+      <div ><b>{{image.caption}}</b></div>
+      <div style="height: 2em" > 
+        <span v-show="img_active === idx">
+          <button class="btn btn-primary" type="button" @click="editImage(image.id)"> Edit </button> 
+          <button class="btn btn-danger" type="button" @click="deleteImage(image.id)">
+            <template v-if="! confirm_step[image.id]">Delete Me</template>
+            <template v-if="confirm_step[image.id]">Sure ?</template>
+          </button>
+        </span>
       </div>
       </li>
     </ul>
@@ -71,7 +78,8 @@ export default {
       images: [],
       store_blog: this.$store.state.blog,
       confirm_step: [],
-      active: -1
+      active: -1,
+      img_active: -1
     }
   },
   firestore () {
@@ -86,7 +94,6 @@ export default {
       this.$router.push({name: 'postedit', params: { blog, post_id }})
     },
     openHref( url ) {
-      console.log(url)
       shell.openExternal(url)
     },
     editImage( id ) {

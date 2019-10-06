@@ -144,6 +144,11 @@ position: fixed;
   color: #007bff;
 }
 
+.linky{
+  color: #007bff;
+  cursor: pointer;
+}
+
 .sidebar .nav-link:hover .feather,
 .sidebar .nav-link.active .feather {
   color: inherit;

@@ -13,9 +13,9 @@
     <tr v-for="(item, idx) in keywords" :key='idx'>
       <td >
         <span @click="show_item(item)"> {{item.keyword}} </span>
-        <a :href="'https://www.google.com/search?q='+item.keyword">
+        <span class="linky" @click="shell.openExternal('https://www.google.com/search?q='+item.keyword)">
           <span class="fas fa-search"></span>
-        </a>
+        </span>
       </td>
       <td>{{item.m_vol}}</td>
       <td>
@@ -37,13 +37,17 @@
 <script >
 import { db } from '../main'
 var moment = require('moment')
+const shell = require('electron').shell
+var marked = require('marked')
+
 export default {
   name: 'content-plan',
   data () {
     return {
       keywords: [],
       confirm_step: [],
-      store_blog: this.$store.state.blog
+      store_blog: this.$store.state.blog,
+      shell: shell
     }
   },
   firestore () {
@@ -55,14 +59,21 @@ export default {
   props : ['manage'],
   methods: {
     new_post(item) {
+      let outlines_arr = item.notes ? marked.lexer(item.notes).filter(item => item.type === 'text') : []
+      let outlines_mds = []
+      outlines_arr.forEach(item => {
+        outlines_mds.push( {content: '## '+ item.text, type: 'md'})
+      })
       var format_date = moment().format('YYYY-MM-DD')
       let post = {
         title: item.keyword,
         slug: item.keyword.replace(/ /g, '-'),
-        md_contents:[],
+        md_contents: outlines_mds,
         front_matter:{date: format_date, author:'',cover:''},
         createdAt: new Date(),
+        draft: true
       }
+      // console.log(post)
       db.collection('posts.'+ this.store_blog.name).add(post)
     },
     show_item(item) {
